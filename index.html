@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohammed — Full-stack &amp; Mobile Developer</title>
+<meta name="description" content="Mohammed — Full-stack & Mobile Developer based in Algeria. Building AqarLink and shipping web, Android, and Flutter projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#06090a;
+    --bg-alt:#0b1210;
+    --green:#39ff8a;
+    --green-bright:#7dffb3;
+    --green-dim:#1f7a4a;
+    --green-faint:rgba(57,255,138,0.12);
+    --border:rgba(57,255,138,0.28);
+    --border-soft:rgba(57,255,138,0.14);
+    --text-dim:#6e9a80;
+    --text-dimmer:#4a6e5a;
+    --black:#020403;
+    --font-mono:'JetBrains Mono', monospace;
+    --font-display:'Space Grotesk', sans-serif;
+    --max:1180px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--green);
+    font-family:var(--font-mono);
+    line-height:1.5;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* scanline + grid ambience */
+  body::before{
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(57,255,138,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,255,138,0.035) 1px, transparent 1px);
+    background-size:42px 42px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(ellipse 90% 60% at 50% 0%, black 40%, transparent 90%);
+  }
+  body::after{
+    content:'';
+    position:fixed; inset:0;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+    z-index:1;
+    opacity:0.35;
+  }
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+  section{position:relative; z-index:2;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+  .eyebrow{
+    font-size:13px; letter-spacing:0.08em; color:var(--text-dim);
+  }
+  .prompt{color:var(--green-bright); margin-right:6px;}
+  .cursor{
+    display:inline-block; width:9px; height:1.1em; background:var(--green);
+    margin-left:4px; vertical-align:-2px;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{opacity:0;} }
+
+  /* ===== NAV ===== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(6,9,10,0.88);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .navbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:var(--max); margin:0 auto;
+  }
+  .logo-block{display:flex; flex-direction:column; gap:2px;}
+  .logo{
+    font-family:var(--font-display); font-weight:700; font-size:20px;
+    letter-spacing:0.02em; color:var(--green);
+  }
+  .logo span{color:var(--green-dim);}
+  .tagline{font-size:11px; color:var(--text-dim); letter-spacing:0.03em;}
+  nav.links{display:flex; align-items:center; gap:26px;}
+  nav.links a{
+    font-size:13px; letter-spacing:0.04em; color:var(--text-dim);
+    transition:color .2s; white-space:nowrap;
+  }
+  nav.links a:hover, nav.links a.active{color:var(--green-bright);}
+  nav.links a.active::before{content:'[ '; color:var(--green-dim);}
+  nav.links a.active::after{content:' ]'; color:var(--green-dim);}
+  .lang-toggle{
+    display:flex; border:1px solid var(--border); border-radius:3px; overflow:hidden;
+    font-size:11px; letter-spacing:0.05em;
+  }
+  .lang-toggle button{
+    background:transparent; border:none; color:var(--text-dim);
+    padding:6px 10px; cursor:pointer; font-family:var(--font-mono); font-weight:600;
+    transition:.2s;
+  }
+  .lang-toggle button.active{background:var(--green); color:var(--black);}
+  .burger{display:none; background:none; border:1px solid var(--border); color:var(--green); padding:8px 12px; font-family:var(--font-mono); cursor:pointer; border-radius:3px; white-space:nowrap; font-size:16px; line-height:1;}
+  .mobile-panel{display:none; flex-direction:column; gap:14px; padding:18px 28px 22px; border-top:1px solid var(--border-soft); background:var(--bg); position:relative; z-index:60;}
+  .mobile-panel a{font-size:14px; color:var(--text-dim);}
+  .mobile-panel.open{display:flex;}
+
+  /* ===== BUTTONS ===== */
+  .btn{
+    display:inline-block; font-family:var(--font-mono); font-weight:600; font-size:13px;
+    letter-spacing:0.05em; padding:13px 22px; border:1px solid var(--green);
+    color:var(--green); background:transparent; cursor:pointer; transition:.2s;
+    text-align:center;
+  }
+  .btn:hover{background:var(--green); color:var(--black);}
+  .btn.ghost{border-color:var(--border); color:var(--text-dim);}
+  .btn.ghost:hover{border-color:var(--green); color:var(--green); background:transparent;}
+
+  /* ===== HERO ===== */
+  .hero{padding:168px 0 90px; position:relative; overflow:hidden;}
+  .matrix-canvas{position:absolute; inset:0; width:100%; height:100%; opacity:0.4; pointer-events:none; z-index:0;}
+  .hero .wrap{position:relative; z-index:1;}
+  .hero::after{
+    content:''; position:absolute; inset:0; z-index:0;
+    background:radial-gradient(ellipse 70% 55% at 30% 30%, var(--bg) 25%, transparent 75%);
+    pointer-events:none;
+  }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--border); padding:7px 16px; font-size:12px;
+    letter-spacing:0.06em; color:var(--text-dim); margin-bottom:34px;
+  }
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  h1{
+    font-family:var(--font-display); font-weight:700; color:#eafff1;
+    font-size:clamp(34px, 5.6vw, 68px); line-height:1.08; letter-spacing:-0.01em;
+    max-width:920px; margin-bottom:30px;
+  }
+  h1 .accent{color:var(--green);}
+  .hero-sub{font-size:15px; color:var(--text-dim); max-width:640px; margin-bottom:42px;}
+  .hero-ctas{display:flex; gap:16px; flex-wrap:wrap; align-items:center;}
+  .hero-preview-stack{display:inline-flex; align-items:center; margin-left:6px;}
+  .hero-preview-stack img{
+    width:62px; height:40px; object-fit:cover; border:1px solid var(--border);
+    background:#0a100c; box-shadow:0 4px 14px rgba(0,0,0,0.5);
+    transition:.25s ease; border-radius:2px;
+  }
+  .hero-preview-stack img:nth-child(1){transform:rotate(-6deg) translateX(10px); z-index:1;}
+  .hero-preview-stack img:nth-child(2){transform:rotate(0deg); z-index:2; margin:0 -14px;}
+  .hero-preview-stack img:nth-child(3){transform:rotate(6deg) translateX(-10px); z-index:1;}
+  .hero-preview-stack:hover img{border-color:var(--green); box-shadow:0 6px 20px rgba(57,255,138,0.25);}
+  .hero-preview-stack:hover img:nth-child(1){transform:rotate(-10deg) translate(6px,-3px);}
+  .hero-preview-stack:hover img:nth-child(3){transform:rotate(10deg) translate(-6px,-3px);}
+
+  /* ===== SECTION HEADERS ===== */
+  .section-head{padding:90px 0 36px;}
+  .section-title{
+    font-family:var(--font-display); font-weight:700; font-size:clamp(26px,3.4vw,38px);
+    color:#eafff1; letter-spacing:-0.01em; margin-bottom:10px;
+  }
+  .section-sub{font-size:14px; color:var(--text-dim);}
+
+  /* ===== WORK CARDS ===== */
+  .grid-cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:22px; padding-bottom:30px;}
+  .card{
+    border:1px solid var(--border-soft); background:var(--bg-alt);
+    padding:26px; display:flex; flex-direction:column; gap:16px;
+    transition:.25s;
+  }
+  .card:hover{border-color:var(--green); box-shadow:0 0 24px rgba(57,255,138,0.08);}
+  .card-id-row{display:flex; flex-wrap:wrap; gap:6px 10px; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--border-soft); padding-bottom:14px;}
+  .card-id{font-size:13px; color:var(--text-dimmer); font-weight:600; white-space:nowrap;}
+  .card-cat{font-size:11px; color:var(--green-dim); letter-spacing:0.05em; text-align:right;}
+  .card-title{font-family:var(--font-display); font-size:19px; font-weight:600; color:#eafff1;}
+  .card-block-label{font-size:11px; color:var(--green-dim); letter-spacing:0.04em; margin-bottom:4px;}
+  .card-block-text{font-size:13px; color:var(--text-dim); line-height:1.55;}
+  .card-block-text.outcome{color:var(--green-bright); font-weight:500;}
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:auto;}
+  .tag{font-size:11px; border:1px solid var(--border); padding:5px 9px; color:var(--text-dim);}
+  .card-link{font-size:12px; color:var(--green); border-top:1px solid var(--border-soft); padding-top:14px; margin-top:4px; display:inline-flex; align-items:center; gap:6px;}
+  .card-link:hover{color:var(--green-bright);}
+  .card-shot{margin:-26px -26px 18px -26px; border-bottom:1px solid var(--border-soft); overflow:hidden; background:#0a100c;}
+  .card-shot-bar{display:flex; align-items:center; gap:6px; padding:9px 14px; border-bottom:1px solid var(--border-soft); background:#0a100c;}
+  .shot-dot{width:7px; height:7px; border-radius:50%; background:var(--green-dim); flex:none;}
+  .shot-url{font-size:11px; color:var(--text-dim); margin-left:6px; letter-spacing:0.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .card-shot img{display:block; width:100%; height:auto; opacity:0.92; transition:.25s ease;}
+  .card:hover .card-shot img{opacity:1; transform:scale(1.015);}
+
+  /* ===== PIPELINE ===== */
+  .pipeline{display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:50px 0 20px; flex-wrap:wrap;}
+  .pipe-node{flex:1; min-width:140px; text-align:center; position:relative;}
+  .pipe-icon{
+    width:64px; height:64px; border:1px solid var(--border); margin:0 auto 14px;
+    display:flex; align-items:center; justify-content:center; font-size:24px; background:var(--bg-alt);
+  }
+  .pipe-title{font-family:var(--font-display); font-weight:600; font-size:14px; color:#eafff1; margin-bottom:8px; letter-spacing:0.02em;}
+  .pipe-desc{font-size:12px; color:var(--text-dim); line-height:1.5; max-width:160px; margin:0 auto;}
+  .pipe-line{position:absolute; top:32px; left:100%; width:40px; height:1px; background:repeating-linear-gradient(90deg, var(--green-dim) 0 6px, transparent 6px 12px); display:none;}
+  @media(min-width:860px){ .pipe-line{display:block;} }
+
+  /* ===== STACK ===== */
+  .stack-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:18px; padding-bottom:30px;}
+  .stack-group{border:1px solid var(--border-soft); padding:20px; background:var(--bg-alt);}
+  .stack-group h4{font-size:12px; color:var(--green-dim); letter-spacing:0.06em; margin-bottom:14px;}
+  .stack-group .tag{display:block; margin-bottom:8px; text-align:center;}
+
+  /* ===== CTA BIG ===== */
+  .cta-big{
+    padding:110px 0; text-align:center; border-top:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft);
+    background:radial-gradient(ellipse 70% 100% at 50% 50%, rgba(57,255,138,0.05), transparent 70%);
+  }
+  .cta-headline{
+    font-family:var(--font-mono); font-weight:800; text-transform:uppercase;
+    font-size:clamp(26px,4.6vw,52px); line-height:1.18; letter-spacing:0.01em;
+    color:var(--green); text-shadow:0 0 18px rgba(57,255,138,0.35);
+    animation:flicker 5s infinite;
+  }
+  @keyframes flicker{0%,97%,100%{opacity:1;} 98%{opacity:.82;} 99%{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ .cta-headline{animation:none;} .dot{animation:none;} .cursor{animation:none;} }
+  .cta-sub{margin-top:22px; font-size:14px; color:var(--text-dim);}
+  .cta-actions{margin-top:36px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
+
+  /* ===== CONTACT ===== */
+  .contact-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; padding:36px 0 50px;}
+  .contact-card{
+    border:1px solid var(--border-soft); background:var(--bg-alt); padding:22px;
+    display:flex; align-items:center; gap:16px; transition:.2s;
+  }
+  .contact-card:hover{border-color:var(--green);}
+  .contact-icon{width:42px; height:42px; flex:none; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px;}
+  .contact-label{font-size:11px; color:var(--text-dim); letter-spacing:0.05em; margin-bottom:4px;}
+  .contact-value{font-size:14px; color:#eafff1; font-weight:600; word-break:break-word;}
+
+  /* ===== ABOUT ===== */
+  .about-text{max-width:760px; font-size:15px; color:var(--text-dim); line-height:1.85;}
+  .about-text strong{color:var(--green-bright); font-weight:600;}
+
+  /* ===== FOOTER ===== */
+  footer{border-top:1px solid var(--border-soft); padding:56px 0 28px;}
+  .footer-grid{display:grid; grid-template-columns:2fr 1fr 1fr; gap:30px; padding-bottom:40px;}
+  .footer-logo{font-family:var(--font-display); font-weight:700; font-size:18px; color:var(--green); margin-bottom:8px;}
+  .footer-meta{font-size:12px; color:var(--text-dim);}
+  .footer-col h5{font-size:12px; color:var(--green-dim); letter-spacing:0.06em; margin-bottom:14px;}
+  .footer-col a, .footer-col li, .footer-col span{display:block; font-size:13px; color:var(--text-dim); margin-bottom:10px;}
+  .footer-col a:hover{color:var(--green-bright);}
+  .footer-bottom{border-top:1px solid var(--border-soft); padding-top:22px; text-align:center; font-size:12px; color:var(--text-dimmer);}
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:920px){
+    nav.links{display:none;}
+    .burger{display:inline-block;}
+    .grid-cards{grid-template-columns:1fr 1fr;}
+    .stack-grid{grid-template-columns:1fr 1fr;}
+    .contact-cards{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr; gap:28px;}
+  }
+  @media (max-width:480px){
+    .navbar{padding:14px 18px; gap:8px;}
+    .logo{font-size:16px;}
+    .tagline{font-size:9px;}
+    .lang-toggle button{padding:5px 8px; font-size:10px;}
+    .burger{padding:7px 9px; font-size:12px;}
+    .wrap{padding:0 18px;}
+  }
+  @media (max-width:600px){
+    .grid-cards{grid-template-columns:1fr;}
+    .stack-grid{grid-template-columns:1fr 1fr;}
+    .hero{padding:150px 0 70px;}
+    .pipeline{flex-direction:column; align-items:center;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="logo-block">
+      <div class="logo">MOHAMMED<span>_</span></div>
+      <div class="tagline" data-i18n="navTagline">Full-stack &amp; Mobile Developer · Algeria</div>
+    </div>
+    <nav class="links" id="navLinks">
+      <a href="#home" data-i18n="navHome">Home</a>
+      <a href="#work" data-i18n="navWork">Work</a>
+      <a href="#infra" data-i18n="navInfra">Infra</a>
+      <a href="#stack" data-i18n="navStack">Stack</a>
+      <a href="#about" data-i18n="navAbout">About</a>
+      <a href="#contact" data-i18n="navContact">Contact</a>
+    </nav>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div class="lang-toggle">
+        <button id="btnFr" data-lang="fr">FR</button>
+        <button id="btnEn" data-lang="en" class="active">EN</button>
+      </div>
+      <button class="burger" id="burgerBtn">≡</button>
+    </div>
+  </div>
+  <div class="mobile-panel" id="mobilePanel">
+    <a href="#home" data-i18n="navHome">Home</a>
+    <a href="#work" data-i18n="navWork">Work</a>
+    <a href="#infra" data-i18n="navInfra">Infra</a>
+    <a href="#stack" data-i18n="navStack">Stack</a>
+    <a href="#about" data-i18n="navAbout">About</a>
+    <a href="#contact" data-i18n="navContact">Contact</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <canvas id="matrix-canvas" class="matrix-canvas" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="status-pill"><span class="dot"></span><span data-i18n="status">OPEN TO NEW PROJECTS</span></div>
+      <h1 data-i18n-html="heroTitle"></h1>
+      <p class="hero-sub"><span class="prompt">&gt;</span><span data-i18n="heroSub"></span><span class="cursor"></span></p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn" data-i18n="ctaDiscuss">[ DISCUSS A PROJECT ]</a>
+        <a href="#work" class="btn ghost" data-i18n="ctaSeeWork">&lt; SEE MY WORK /&gt;</a>
+        <a href="#work" class="hero-preview-stack" aria-label="Preview of work screenshots">
+          <img src="assets/aqarlink.jpg" alt="" loading="lazy">
+          <img src="assets/transdemexpress.jpg" alt="" loading="lazy">
+          <img src="assets/diphaco.jpg" alt="" loading="lazy">
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="workEyebrow">// SELECTED WORK</div>
+        <h2 class="section-title" data-i18n="workTitle">Real projects, real constraints.</h2>
+        <p class="section-sub"><span class="prompt">&gt;</span><span data-i18n="workSub"></span><span class="cursor"></span></p>
+      </div>
+
+      <div class="grid-cards">
+        <!-- CARD 1: AqarLink -->
+        <div class="card">
+          <div class="card-shot">
+            <div class="card-shot-bar"><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-url">aqarlink.net</span></div>
+            <img src="assets/aqarlink.jpg" alt="AqarLink website screenshot" loading="lazy">
+          </div>
+          <div class="card-id-row">
+            <span class="card-id">ID: 001</span>
+            <span class="card-cat" data-i18n="card1Cat">[PROPTECH / LEGALTECH]</span>
+          </div>
+          <div class="card-title">AqarLink</div>
+          <div>
+            <div class="card-block-label" data-i18n="lblContext">// CONTEXT</div>
+            <div class="card-block-text" data-i18n="card1Context"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblWork">// WORK</div>
+            <div class="card-block-text" data-i18n="card1Work"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblOutcome">// OUTCOME</div>
+            <div class="card-block-text outcome" data-i18n="card1Outcome"></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Next.js</span><span class="tag">Flutter</span><span class="tag">Android</span>
+            <span class="tag">PostgreSQL</span><span class="tag">AWS</span>
+          </div>
+          <a href="https://aqarlink.net" target="_blank" rel="noopener" class="card-link"><span data-i18n="viewLive">VIEW LIVE</span> →</a>
+        </div>
+
+        <!-- CARD 2: Trans Dem Express -->
+        <div class="card">
+          <div class="card-shot">
+            <div class="card-shot-bar"><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-url">transdemexpress.fr</span></div>
+            <img src="assets/transdemexpress.jpg" alt="Trans Dem Express website screenshot" loading="lazy">
+          </div>
+          <div class="card-id-row">
+            <span class="card-id">ID: 002</span>
+            <span class="card-cat" data-i18n="card2Cat">[WEB / BRANDING]</span>
+          </div>
+          <div class="card-title">Trans Dem Express</div>
+          <div>
+            <div class="card-block-label" data-i18n="lblContext">// CONTEXT</div>
+            <div class="card-block-text" data-i18n="card2Context"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblWork">// WORK</div>
+            <div class="card-block-text" data-i18n="card2Work"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblOutcome">// OUTCOME</div>
+            <div class="card-block-text outcome" data-i18n="card2Outcome"></div>
+          </div>
+          <div class="tags">
+            <span class="tag">HTML/CSS/JS</span><span class="tag" data-i18n="tagAnimation">Animation</span><span class="tag" data-i18n="tagBilingual">FR/EN</span>
+          </div>
+          <a href="https://transdemexpress.fr" target="_blank" rel="noopener" class="card-link"><span data-i18n="viewLive">VIEW LIVE</span> →</a>
+        </div>
+
+        <!-- CARD 3: Infra -->
+        <div class="card">
+          <div class="card-shot">
+            <div class="card-shot-bar"><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-url">ssh mohammed@aqarlink-prod</span></div>
+            <img src="assets/infra-terminal.jpg" alt="Production server terminal showing Docker containers and nginx status" loading="lazy">
+          </div>
+          <div class="card-id-row">
+            <span class="card-id">ID: 003</span>
+            <span class="card-cat" data-i18n="card3Cat">[INFRASTRUCTURE]</span>
+          </div>
+          <div class="card-title" data-i18n="card3Title">Production Infra for AqarLink</div>
+          <div>
+            <div class="card-block-label" data-i18n="lblContext">// CONTEXT</div>
+            <div class="card-block-text" data-i18n="card3Context"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblWork">// WORK</div>
+            <div class="card-block-text" data-i18n="card3Work"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblOutcome">// OUTCOME</div>
+            <div class="card-block-text outcome" data-i18n="card3Outcome"></div>
+          </div>
+          <div class="tags">
+            <span class="tag">AWS EC2</span><span class="tag">Docker</span><span class="tag">nginx</span>
+            <span class="tag">Cloudflare</span><span class="tag">n8n</span>
+          </div>
+        </div>
+
+        <!-- CARD 4: Diphaco -->
+        <div class="card">
+          <div class="card-shot">
+            <div class="card-shot-bar"><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-url">diphaco.dz</span></div>
+            <img src="assets/diphaco.jpg" alt="Diphaco website screenshot" loading="lazy">
+          </div>
+          <div class="card-id-row">
+            <span class="card-id">ID: 004</span>
+            <span class="card-cat" data-i18n="card4Cat">[WEB / CORPORATE]</span>
+          </div>
+          <div class="card-title">Diphaco</div>
+          <div>
+            <div class="card-block-label" data-i18n="lblContext">// CONTEXT</div>
+            <div class="card-block-text" data-i18n="card4Context"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblWork">// WORK</div>
+            <div class="card-block-text" data-i18n="card4Work"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblOutcome">// OUTCOME</div>
+            <div class="card-block-text outcome" data-i18n="card4Outcome"></div>
+          </div>
+          <div class="tags">
+            <span class="tag">HTML/CSS/JS</span><span class="tag" data-i18n="tagCorporate">Corporate</span><span class="tag" data-i18n="tagHealthcare">Healthcare</span>
+          </div>
+          <a href="https://diphaco.dz" target="_blank" rel="noopener" class="card-link"><span data-i18n="viewLive">VIEW LIVE</span> →</a>
+        </div>
+
+        <!-- CARD 5: Diphaco ERP & BI -->
+        <div class="card">
+          <div class="card-shot">
+            <div class="card-shot-bar"><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-dot"></span><span class="shot-url">metabase.diphaco.local</span></div>
+            <img src="assets/diphaco-bi.jpg" alt="Metabase-style BI dashboard with sales and delivery KPIs" loading="lazy">
+          </div>
+          <div class="card-id-row">
+            <span class="card-id">ID: 005</span>
+            <span class="card-cat" data-i18n="card5Cat">[ERP / BUSINESS INTELLIGENCE]</span>
+          </div>
+          <div class="card-title" data-i18n="card5Title">Diphaco ERP &amp; BI</div>
+          <div>
+            <div class="card-block-label" data-i18n="lblContext">// CONTEXT</div>
+            <div class="card-block-text" data-i18n="card5Context"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblWork">// WORK</div>
+            <div class="card-block-text" data-i18n="card5Work"></div>
+          </div>
+          <div>
+            <div class="card-block-label" data-i18n="lblOutcome">// OUTCOME</div>
+            <div class="card-block-text outcome" data-i18n="card5Outcome"></div>
+          </div>
+          <div class="tags">
+            <span class="tag">Axelor</span><span class="tag" data-i18n="tagCustomModules">Custom Modules</span><span class="tag" data-i18n="tagSCF">SCF Accounting</span>
+            <span class="tag">Metabase</span><span class="tag" data-i18n="tagBI">BI/Reporting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFRA PIPELINE -->
+  <section id="infra">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="infraEyebrow">// HOW IT RUNS IN PRODUCTION</div>
+        <h2 class="section-title" data-i18n="infraTitle">From request to response.</h2>
+        <p class="section-sub"><span class="prompt">&gt;</span><span data-i18n="infraSub"></span><span class="cursor"></span></p>
+      </div>
+
+      <div class="pipeline">
+        <div class="pipe-node">
+          <div class="pipe-icon">◧</div>
+          <div class="pipe-title" data-i18n="pipe1Title">DOMAIN &amp; DNS</div>
+          <div class="pipe-desc" data-i18n="pipe1Desc"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-node">
+          <div class="pipe-icon">☁</div>
+          <div class="pipe-title" data-i18n="pipe2Title">CLOUDFLARE EDGE</div>
+          <div class="pipe-desc" data-i18n="pipe2Desc"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-node">
+          <div class="pipe-icon">▦</div>
+          <div class="pipe-title" data-i18n="pipe3Title">NGINX + CERTBOT</div>
+          <div class="pipe-desc" data-i18n="pipe3Desc"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-node">
+          <div class="pipe-icon">▣</div>
+          <div class="pipe-title" data-i18n="pipe4Title">APP SERVICES</div>
+          <div class="pipe-desc" data-i18n="pipe4Desc"></div>
+          <div class="pipe-line"></div>
+        </div>
+        <div class="pipe-node">
+          <div class="pipe-icon">⚙</div>
+          <div class="pipe-title" data-i18n="pipe5Title">AUTOMATION &amp; STORAGE</div>
+          <div class="pipe-desc" data-i18n="pipe5Desc"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="stackEyebrow">// STACK</div>
+        <h2 class="section-title" data-i18n="stackTitle">Tools, grouped by job.</h2>
+        <p class="section-sub"><span class="prompt">&gt;</span><span data-i18n="stackSub"></span><span class="cursor"></span></p>
+      </div>
+      <div class="stack-grid">
+        <div class="stack-group">
+          <h4 data-i18n="stackGroup1">WEB &amp; MOBILE</h4>
+          <span class="tag">Next.js</span><span class="tag">React</span><span class="tag">Flutter</span>
+          <span class="tag">Dart</span><span class="tag">TypeScript</span><span class="tag">Tailwind CSS</span>
+        </div>
+        <div class="stack-group">
+          <h4 data-i18n="stackGroup2">BACKEND</h4>
+          <span class="tag">Node.js</span><span class="tag">Python</span><span class="tag">PostgreSQL</span><span class="tag">Redis</span>
+        </div>
+        <div class="stack-group">
+          <h4 data-i18n="stackGroup3">NATIVE ANDROID</h4>
+          <span class="tag">Android SDK</span><span class="tag">Kotlin</span><span class="tag">Java</span><span class="tag">Google Play Console</span>
+        </div>
+        <div class="stack-group">
+          <h4 data-i18n="stackGroup4">INFRA &amp; OPS</h4>
+          <span class="tag">Docker</span><span class="tag">nginx</span><span class="tag">Cloudflare</span>
+          <span class="tag">AWS EC2</span><span class="tag">n8n</span>
+        </div>
+        <div class="stack-group">
+          <h4 data-i18n="stackGroup5">ERP &amp; BI</h4>
+          <span class="tag">Axelor</span><span class="tag">Metabase</span><span class="tag">SQL</span><span class="tag" data-i18n="tagSCF">SCF Accounting</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BIG -->
+  <section class="cta-big">
+    <div class="wrap">
+      <div class="cta-headline" data-i18n-html="ctaBig">GOT A PROJECT?<br>LET'S SHIP IT.</div>
+      <p class="cta-sub"><span class="prompt">&gt;</span><span data-i18n="ctaBigSub"></span><span class="cursor"></span></p>
+      <div class="cta-actions">
+        <a href="mailto:houssam2293@gmail.com" class="btn" data-i18n="ctaSendEmail">[ SEND AN EMAIL ]</a>
+        <a href="https://wa.me/213552751861" target="_blank" rel="noopener" class="btn ghost" data-i18n="ctaWhatsapp">&lt; MESSAGE ON WHATSAPP /&gt;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="aboutEyebrow">// ABOUT</div>
+        <h2 class="section-title" data-i18n="aboutTitle">Who's behind this.</h2>
+      </div>
+      <p class="about-text" data-i18n-html="aboutText"></p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="contactEyebrow">// CONTACT</div>
+        <h2 class="section-title" data-i18n="contactTitle">Reach out directly.</h2>
+        <p class="section-sub"><span class="prompt">&gt;</span><span data-i18n="contactSub"></span><span class="cursor"></span></p>
+      </div>
+      <div class="contact-cards">
+        <a class="contact-card" href="mailto:houssam2293@gmail.com">
+          <div class="contact-icon">✉</div>
+          <div>
+            <div class="contact-label" data-i18n="lblEmail">EMAIL</div>
+            <div class="contact-value">houssam2293@gmail.com</div>
+          </div>
+        </a>
+        <a class="contact-card" href="https://wa.me/213552751861" target="_blank" rel="noopener">
+          <div class="contact-icon">☏</div>
+          <div>
+            <div class="contact-label" data-i18n="lblWhatsapp">WHATSAPP</div>
+            <div class="contact-value">+213 552 75 18 61</div>
+          </div>
+        </a>
+        <a class="contact-card" href="https://github.com/houssam2293" target="_blank" rel="noopener">
+          <div class="contact-icon">⌥</div>
+          <div>
+            <div class="contact-label" data-i18n="lblGithub">GITHUB</div>
+            <div class="contact-value">github.com/houssam2293</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">MOHAMMED_</div>
+        <div class="footer-meta" data-i18n="footerMeta">Algeria · Full-stack &amp; Mobile Developer</div>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footerServices">SERVICES</h5>
+        <span data-i18n="svc1">&gt; Web Development</span>
+        <span data-i18n="svc2">&gt; Mobile Development</span>
+        <span data-i18n="svc3">&gt; Infrastructure &amp; DevOps</span>
+        <span data-i18n="svc4">&gt; ERP &amp; BI Consulting</span>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footerLinks">LINKS</h5>
+        <a href="https://aqarlink.net" target="_blank" rel="noopener">&gt; AqarLink (live)</a>
+        <a href="https://diphaco.dz" target="_blank" rel="noopener">&gt; Diphaco (live)</a>
+        <a href="https://github.com/houssam2293" target="_blank" rel="noopener">&gt; GitHub</a>
+      </div>
+    </div>
+    <div class="footer-bottom" data-i18n="footerBottom">Built in Algeria © 2026</div>
+  </div>
+</footer>
+
+<script>
+const i18n = {
+  en: {
+    navTagline:"Full-stack & Mobile Developer · Algeria",
+    navHome:"Home", navWork:"Work", navInfra:"Infra", navStack:"Stack", navAbout:"About", navContact:"Contact",
+    status:"OPEN TO NEW PROJECTS",
+    heroTitle:"Algeria-based developer building <span class=\"accent\">web platforms</span>, <span class=\"accent\">mobile apps</span>, and the infrastructure that runs them.",
+    heroSub:" Currently building AqarLink — a PropTech & LegalTech platform connecting buyers, sellers, and certified notaires across Algeria.",
+    ctaDiscuss:"[ DISCUSS A PROJECT ]",
+    ctaSeeWork:"< SEE MY WORK />",
+    workEyebrow:"// SELECTED WORK",
+    workTitle:"Real projects, real constraints.",
+    workSub:" A few things I've shipped, and what it took to get them live.",
+    lblContext:"// CONTEXT", lblWork:"// WORK", lblOutcome:"// OUTCOME",
+    card1Cat:"[PROPTECH / LEGALTECH]",
+    card1Context:"Algeria's property market had no trusted, bilingual platform connecting buyers, sellers, and certified notaires across all 58 wilayas.",
+    card1Work:"Started as a native Android app, then rebuilt into a full bilingual (French/Arabic, RTL-aware) platform — Next.js web frontend, Flutter mobile app, a notaire onboarding & KYC flow, and production infrastructure on AWS.",
+    card1Outcome:"Live platform at aqarlink.net, with real notaire onboarding and listing flows in production.",
+    viewLive:"VIEW LIVE",
+    card2Cat:"[WEB / BRANDING]",
+    card2Context:"A moving company needed a bilingual landing page that felt premium and actually converted visitors into leads.",
+    card2Work:"Built a bilingual French/English landing page with motion design, a services-tier breakdown, and the brand's visual identity embedded throughout.",
+    card2Outcome:"Live site representing the brand to new customers.",
+    tagAnimation:"Animation", tagBilingual:"FR/EN",
+    card3Cat:"[INFRASTRUCTURE]",
+    card3Title:"Production Infra for AqarLink",
+    card3Context:"AqarLink needed a reliable home for multiple services — web app, automation, file storage, messaging — without downtime.",
+    card3Work:"Configured an AWS EC2 instance (Frankfurt) running Next.js, n8n, MinIO, and OpenWA behind Cloudflare (Full Strict SSL) and nginx with Certbot. Diagnosed and fixed DNS misrouting, real-IP detection behind Cloudflare's edge, and service startup issues.",
+    card3Outcome:"Stable, multi-service production environment with correct SSL and real client IPs.",
+    card4Cat:"[WEB / CORPORATE]",
+    card4Context:"A pharmaceutical distribution company in Oran, with 20+ years in the market and an exclusive partnership with SOPHAL labs, had no website to match its standing.",
+    card4Work:"Built the corporate website from scratch with custom HTML/CSS/JS — company history, partner labs, and contact information.",
+    card4Outcome:"Live corporate site at diphaco.dz representing the company online.",
+    tagCorporate:"Corporate", tagHealthcare:"Healthcare",
+    card5Cat:"[ERP / BUSINESS INTELLIGENCE]",
+    card5Title:"Diphaco ERP & BI",
+    card5Context:"Diphaco's distribution operations ran across multiple disconnected systems, with no unified view of sales, stock, and delivery performance.",
+    card5Work:"Integrated Axelor ERP and customized it specifically for Diphaco's business needs, including a custom module and a from-scratch SCF (Système Comptable Financier) accounting configuration. Layered Metabase on top, connected to the database, for live dashboards and KPI tracking.",
+    card5Outcome:"Centralized operational data with real-time dashboards giving leadership visibility into sales, stock, and delivery KPIs.",
+    tagBI:"BI/Reporting", tagConsulting:"Consulting",
+    tagCustomModules:"Custom Modules", tagSCF:"SCF Accounting",
+    infraEyebrow:"// HOW IT RUNS IN PRODUCTION",
+    infraTitle:"From request to response.",
+    infraSub:" The actual path a request takes through AqarLink's infrastructure — not just the code.",
+    pipe1Title:"DOMAIN & DNS", pipe1Desc:"DNS pointed at a stable Elastic IP, not an ephemeral one.",
+    pipe2Title:"CLOUDFLARE EDGE", pipe2Desc:"Full Strict SSL, real visitor IP forwarded to origin.",
+    pipe3Title:"NGINX + CERTBOT", pipe3Desc:"TLS termination and routing for every subdomain.",
+    pipe4Title:"APP SERVICES", pipe4Desc:"Next.js frontend and API, Flutter mobile backend.",
+    pipe5Title:"AUTOMATION & STORAGE", pipe5Desc:"n8n workflows and MinIO object storage.",
+    stackEyebrow:"// STACK",
+    stackTitle:"Tools, grouped by job.",
+    stackSub:" Chosen for speed of delivery and long-term maintainability.",
+    stackGroup1:"WEB & MOBILE", stackGroup2:"BACKEND", stackGroup3:"NATIVE ANDROID", stackGroup4:"INFRA & OPS",
+    stackGroup5:"ERP & BI", tagERPIntegration:"ERP Integration", tagKPI:"KPI Reporting",
+    ctaBig:"GOT A PROJECT?<br>LET'S SHIP IT.",
+    ctaBigSub:" Tell me what you're building. I'll tell you what it takes.",
+    ctaSendEmail:"[ SEND AN EMAIL ]",
+    ctaWhatsapp:"< MESSAGE ON WHATSAPP />",
+    aboutEyebrow:"// ABOUT",
+    aboutTitle:"Who's behind this.",
+    aboutText:"I'm <strong>Mohammed</strong>, a full-stack and mobile developer based in Algeria. I build across the whole stack — Next.js and React on the web, Flutter and native Android on mobile, and the servers, reverse proxies, and automation that keep it all running. Right now most of my time goes into <strong>AqarLink</strong>, a bilingual PropTech & LegalTech platform connecting property buyers, sellers, and certified notaires across Algeria's wilayas. I also take on freelance web and mobile projects outside of that.",
+    contactEyebrow:"// CONTACT",
+    contactTitle:"Reach out directly.",
+    contactSub:" No forms, no middlemen — pick whatever's easiest.",
+    lblEmail:"EMAIL", lblWhatsapp:"WHATSAPP", lblGithub:"GITHUB",
+    footerMeta:"Algeria · Full-stack & Mobile Developer",
+    footerServices:"SERVICES",
+    svc1:"> Web Development", svc2:"> Mobile Development", svc3:"> Infrastructure & DevOps",
+    svc4:"> ERP & BI Consulting",
+    footerLinks:"LINKS",
+    footerBottom:"Built in Algeria © 2026"
+  },
+  fr: {
+    navTagline:"Développeur Full-stack & Mobile · Algérie",
+    navHome:"Accueil", navWork:"Projets", navInfra:"Infra", navStack:"Stack", navAbout:"À propos", navContact:"Contact",
+    status:"DISPONIBLE POUR NOUVEAUX PROJETS",
+    heroTitle:"Développeur basé en Algérie, je construis des <span class=\"accent\">plateformes web</span>, des <span class=\"accent\">applications mobiles</span>, et l'infrastructure qui les fait tourner.",
+    heroSub:" Actuellement en train de construire AqarLink — une plateforme PropTech & LegalTech connectant acheteurs, vendeurs et notaires certifiés à travers l'Algérie.",
+    ctaDiscuss:"[ DISCUTER D'UN PROJET ]",
+    ctaSeeWork:"< VOIR MES PROJETS />",
+    workEyebrow:"// PROJETS SÉLECTIONNÉS",
+    workTitle:"De vrais projets, de vraies contraintes.",
+    workSub:" Quelques projets que j'ai livrés, et ce qu'il a fallu pour les mettre en ligne.",
+    lblContext:"// CONTEXTE", lblWork:"// TRAVAIL", lblOutcome:"// RÉSULTAT",
+    card1Cat:"[PROPTECH / LEGALTECH]",
+    card1Context:"Le marché immobilier algérien n'avait pas de plateforme bilingue de confiance reliant acheteurs, vendeurs et notaires certifiés à travers les 58 wilayas.",
+    card1Work:"Démarré comme application Android native, puis reconstruit en une plateforme bilingue complète (français/arabe, compatible RTL) — frontend web Next.js, application mobile Flutter, un parcours d'onboarding et KYC pour les notaires, et une infrastructure de production sur AWS.",
+    card1Outcome:"Plateforme en ligne sur aqarlink.net, avec de vrais flux d'onboarding notaire et d'annonces en production.",
+    viewLive:"VOIR EN LIGNE",
+    card2Cat:"[WEB / BRANDING]",
+    card2Context:"Une entreprise de transport/déménagement avait besoin d'une landing page bilingue qui paraisse premium et convertisse vraiment les visiteurs en clients.",
+    card2Work:"Création d'une landing page bilingue français/anglais avec animations, une présentation des offres de services par niveau, et l'identité visuelle de la marque intégrée partout.",
+    card2Outcome:"Site en ligne représentant la marque auprès de nouveaux clients.",
+    tagAnimation:"Animation", tagBilingual:"FR/EN",
+    card3Cat:"[INFRASTRUCTURE]",
+    card3Title:"Infra de production pour AqarLink",
+    card3Context:"AqarLink avait besoin d'un hébergement fiable pour plusieurs services — application web, automatisation, stockage de fichiers, messagerie — sans interruption.",
+    card3Work:"Configuration d'une instance AWS EC2 (Francfort) faisant tourner Next.js, n8n, MinIO et OpenWA derrière Cloudflare (SSL Full Strict) et nginx avec Certbot. Diagnostic et correction du routage DNS incorrect, de la détection de l'IP réelle derrière le edge Cloudflare, et de problèmes de démarrage des services.",
+    card3Outcome:"Environnement de production multi-services stable, avec SSL correct et IPs clients réelles.",
+    card4Cat:"[WEB / CORPORATE]",
+    card4Context:"Une entreprise de distribution pharmaceutique à Oran, avec plus de 20 ans d'expérience et un partenariat exclusif avec les laboratoires SOPHAL, n'avait pas de site web à la hauteur de sa place sur le marché.",
+    card4Work:"Site web corporate construit de zéro en HTML/CSS/JS — historique de l'entreprise, laboratoires partenaires, et informations de contact.",
+    card4Outcome:"Site corporate en ligne sur diphaco.dz représentant l'entreprise.",
+    tagCorporate:"Corporate", tagHealthcare:"Santé",
+    card5Cat:"[ERP / BUSINESS INTELLIGENCE]",
+    card5Title:"Diphaco ERP & BI",
+    card5Context:"Les opérations de distribution de Diphaco reposaient sur plusieurs systèmes séparés, sans vue unifiée des ventes, du stock et des performances de livraison.",
+    card5Work:"Intégration d'Axelor ERP avec des personnalisations spécifiques aux besoins de Diphaco, incluant un module custom et une configuration comptable SCF (Système Comptable Financier) réalisée de zéro. Mise en place de Metabase par-dessus, connectée à la base de données, pour des tableaux de bord et KPI en temps réel.",
+    card5Outcome:"Données opérationnelles centralisées avec des tableaux de bord en temps réel donnant à la direction une visibilité sur les KPI de ventes, de stock et de livraison.",
+    tagBI:"BI/Reporting", tagConsulting:"Consulting",
+    tagCustomModules:"Modules sur mesure", tagSCF:"Comptabilité SCF",
+    infraEyebrow:"// COMMENT ÇA TOURNE EN PRODUCTION",
+    infraTitle:"De la requête à la réponse.",
+    infraSub:" Le chemin réel d'une requête à travers l'infrastructure d'AqarLink — pas seulement le code.",
+    pipe1Title:"DOMAINE & DNS", pipe1Desc:"DNS pointé vers une IP Elastic stable, pas une IP éphémère.",
+    pipe2Title:"EDGE CLOUDFLARE", pipe2Desc:"SSL Full Strict, vraie IP du visiteur transmise à l'origine.",
+    pipe3Title:"NGINX + CERTBOT", pipe3Desc:"Terminaison TLS et routage pour chaque sous-domaine.",
+    pipe4Title:"SERVICES APPLICATIFS", pipe4Desc:"Frontend et API Next.js, backend mobile Flutter.",
+    pipe5Title:"AUTOMATISATION & STOCKAGE", pipe5Desc:"Workflows n8n et stockage objet MinIO.",
+    stackEyebrow:"// STACK",
+    stackTitle:"Des outils, classés par fonction.",
+    stackSub:" Choisis pour la rapidité de livraison et la maintenabilité à long terme.",
+    stackGroup1:"WEB & MOBILE", stackGroup2:"BACKEND", stackGroup3:"ANDROID NATIF", stackGroup4:"INFRA & OPS",
+    stackGroup5:"ERP & BI", tagERPIntegration:"Intégration ERP", tagKPI:"Reporting KPI",
+    ctaBig:"UN PROJET EN TÊTE ?<br>ON LE LIVRE.",
+    ctaBigSub:" Dis-moi ce que tu construis. Je te dirai ce qu'il faut pour y arriver.",
+    ctaSendEmail:"[ ENVOYER UN EMAIL ]",
+    ctaWhatsapp:"< ÉCRIRE SUR WHATSAPP />",
+    aboutEyebrow:"// À PROPOS",
+    aboutTitle:"Qui est derrière tout ça.",
+    aboutText:"Je suis <strong>Mohammed</strong>, développeur full-stack et mobile basé en Algérie. Je travaille sur toute la chaîne — Next.js et React côté web, Flutter et Android natif côté mobile, ainsi que les serveurs, reverse proxies et automatisations qui font tourner le tout. Aujourd'hui, l'essentiel de mon temps va à <strong>AqarLink</strong>, une plateforme PropTech & LegalTech bilingue connectant acheteurs, vendeurs et notaires certifiés à travers les wilayas d'Algérie. Je prends aussi des projets web et mobile en freelance en parallèle.",
+    contactEyebrow:"// CONTACT",
+    contactTitle:"Contactez-moi directement.",
+    contactSub:" Pas de formulaire, pas d'intermédiaire — choisissez ce qui vous convient.",
+    lblEmail:"EMAIL", lblWhatsapp:"WHATSAPP", lblGithub:"GITHUB",
+    footerMeta:"Algérie · Développeur Full-stack & Mobile",
+    footerServices:"SERVICES",
+    svc1:"> Développement Web", svc2:"> Développement Mobile", svc3:"> Infrastructure & DevOps",
+    svc4:"> Conseil ERP & BI",
+    footerLinks:"LIENS",
+    footerBottom:"Construit en Algérie © 2026"
+  }
+};
+
+function applyLang(lang){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(i18n[lang][key] !== undefined) el.textContent = i18n[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-html');
+    if(i18n[lang][key] !== undefined) el.innerHTML = i18n[lang][key];
+  });
+  document.getElementById('btnEn').classList.toggle('active', lang==='en');
+  document.getElementById('btnFr').classList.toggle('active', lang==='fr');
+  localStorage.setItem('site-lang', lang);
+  document.title = lang==='fr' ? "Mohammed — Développeur Full-stack & Mobile" : "Mohammed — Full-stack & Mobile Developer";
+}
+
+document.getElementById('btnEn').addEventListener('click', ()=>applyLang('en'));
+document.getElementById('btnFr').addEventListener('click', ()=>applyLang('fr'));
+
+const burger = document.getElementById('burgerBtn');
+const panel = document.getElementById('mobilePanel');
+burger.addEventListener('click', ()=>{
+  panel.classList.toggle('open');
+});
+panel.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>panel.classList.remove('open')));
+
+// scroll spy
+const sections = ['home','work','infra','stack','about','contact'];
+const navAnchors = document.querySelectorAll('#navLinks a');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navAnchors.forEach(a=>a.classList.remove('active'));
+      const match = document.querySelector('#navLinks a[href="#'+entry.target.id+'"]');
+      if(match) match.classList.add('active');
+    }
+  });
+},{rootMargin:'-45% 0px -45% 0px'});
+sections.forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) observer.observe(el);
+});
+
+applyLang('en');
+
+// Matrix rain effect behind hero
+(function(){
+  const canvas = document.getElementById('matrix-canvas');
+  const heroSection = document.getElementById('home');
+  if(!canvas || !heroSection) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+
+  const ctx = canvas.getContext('2d');
+  const chars = 'アァイィウヴエカガキギクグケゲコゴサザシジスズセゼソゾタダチッツヅテデトドナニヌネノハバヒビフブヘベホボマミムメモヤユョラリルレロワン0123456789';
+  const fontSize = 14;
+  let width, height, columns, drops, dpr;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = heroSection.offsetWidth;
+    height = heroSection.offsetHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    columns = Math.floor(width / fontSize);
+    drops = new Array(columns).fill(0).map(()=> Math.random() * -60);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw(){
+    ctx.fillStyle = 'rgba(6,9,10,0.1)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = fontSize + 'px monospace';
+    for(let i = 0; i < columns; i++){
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+      ctx.fillStyle = 'rgba(125,255,179,0.85)';
+      ctx.fillText(text, x, y);
+      ctx.fillStyle = 'rgba(57,255,138,0.55)';
+      ctx.fillText(text, x, y - fontSize);
+      if(y > height && Math.random() > 0.975){
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  let intervalId = setInterval(draw, 55);
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting && !intervalId){
+        intervalId = setInterval(draw, 55);
+      } else if(!entry.isIntersecting && intervalId){
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    });
+  }, {threshold: 0});
+  io.observe(heroSection);
+})();
+</script>
+
+</body>
+</html>
